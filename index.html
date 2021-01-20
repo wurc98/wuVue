@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wuVue</title>
+</head>
+<body>
+    <div id="app">
+        <h1>{{msg}}</h1>
+        <input v-model="msg"/>
+    </div>
+    <script src="./wuVue.js"></script>
+    <script >
+        const vm = new wuVue({
+            el:"#app",
+            data:()=>{
+                    return {msg:1}
+            }
+        })
+        console.log(vm)
+    </script>
+</body>
+</html>
