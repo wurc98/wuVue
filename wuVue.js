@@ -3,6 +3,8 @@ class Observer {
     constructor(data) {
         typeof data == 'function' ? data = data() : null;
         this.observer(data)
+
+
     }
     observer(data) {
         if (data && typeof data == 'object') {
@@ -30,15 +32,39 @@ class Observer {
         })
     }
 }
-
+//模板
+class Compiler {
+    constructor(el, vm) {
+        this.el = this.isElementNode(el) ? el : document.querySelector(el)
+        this.vm = vm
+        this.complieFragment(this.el)
+    }
+    isElementNode(el) {
+        return el.nodeType === 1;
+    }
+    complieFragment(el) {
+        const f = document.createDocumentFragment();
+        let firstChild;
+        while (firstChild = el.firstChild) {
+            console.log(el)
+            f.appendChild(firstChild)
+        }
+        console.dir(f)
+        return f
+    }
+}
 class wuVue {
     constructor(options) {
         this.$el = options.el;
         typeof options.data == 'function' ? options.data = options.data() : null;
         this.$data = options.data;
         this.$options = options;
+
         // 创建观察者
-        new Observer(this.$data)
+        new Observer(this.$data);
+        //处理模板部分，将模板中使用
+        new Compiler(this.$el, this);
+
         this.proxData(this.$data)
     }
     //做转发， 将$data上的数据转发到实例对象上。
