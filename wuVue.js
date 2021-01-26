@@ -13,7 +13,6 @@ const utils = {
     },
     //v-model
     model(node, key, vm) {
-        const initValue = this.getValue(key, vm)
         node.addEventListener('input', (e) => {
             const newValue = e.target.value;
             this.setValue(key, vm, newValue)
@@ -23,8 +22,7 @@ const utils = {
         if (value.includes("{{")) {
             //{{}}
             res = value.replace(/\{\{(.+)\}\}/g, (...args) => {
-                console.log('args :>> ', args);
-                const expr = args[1]
+                const expr = args[1].trim()
                 new Watcher(expr,vm,(newValue)=>{
                     this.textUpdater(node,newValue)
                 })
@@ -34,20 +32,19 @@ const utils = {
             //v-text
             res = this.getValue(value, vm)
         }
-        console.log('res :>> ', res);
         this.textUpdater(node,res)
     },
     on(node, value, vm, eventName) {
 
     }
 }
-//更新DOM
+//每个绑定了$data数据的标签都会有一个Watcher，用来更新DOM
 class Watcher{
     constructor(expr,vm,cb){
         this.expr = expr;
         this.vm = vm;
         this.cb = cb;
-        this.oldValue = this.getOldValue;
+        this.oldValue = this.getOldValue();
     }
     getOldValue(){
         //标记当前watcher实例
@@ -72,7 +69,6 @@ class Dependence{
         this.collect.push(Watcher)
     }
     notify(){
-        console.log("notify",this.collect)
         this.collect.forEach(w=>w.update())
     }
 }
@@ -82,8 +78,6 @@ class Observer {
     constructor(data) {
         typeof data == 'function' ? data = data() : null;
         this.observer(data)
-
-
     }
     observer(data) {
         if (data && typeof data == 'object') {
@@ -100,7 +94,7 @@ class Observer {
         Object.defineProperty(obj, key, {
             get: () => {
                 const target = Dependence.target;
-                console.log('target :>> ', target);
+                console.log('target :>> ',Dependence.target);
                 target&&dep.addWatcher(target)
                 console.log("get value", key, value)
                 return value;
@@ -109,10 +103,10 @@ class Observer {
                 if (value == newVal) return;
                 //当newVal为对象时。
                 this.observer(newVal)
-                //更新
-                dep.notify()
                 console.log("set value", key, newVal)
                 value = newVal;
+                //更新
+                dep.notify()]
             }
         })
     }
@@ -156,10 +150,8 @@ class Compiler {
                 //将指令 v-model v-text v-bind v-on:click... 结构出来
                 const [, directive] = name.split('-')
                 const [compileKey, eventName] = directive.split(":")
-                console.log(directive, value)
                 utils[compileKey](node, value, this.vm, eventName)
             }
-
         })
     }
     isDirector(name) {
@@ -169,8 +161,6 @@ class Compiler {
     compileText(node) {
         const content = node.textContent;
         if (/\{\{(.+)\}\}/.test(content)) {
-            console.log(content)
-            console.log('content :>> ', content);
             //转发到v-text处理
             utils["text"](node, content, this.vm)
         }
@@ -208,7 +198,6 @@ class wuVue {
     }
     //做转发， 将$data上的数据转发到实例对象上。
     proxData(data) {
-
         Object.keys(data).forEach(key => {
             Object.defineProperty(this, key, {
                 //获取数据

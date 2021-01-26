@@ -10,6 +10,7 @@
 <body>
     <div id="app">
         <h1>{{msg}}</h1>
+        <h1>{{a}}</h1>
         <input v-model="msg" />
     </div>
     <script src="./wuVue.js"></script>
@@ -17,7 +18,7 @@
         const vm = new wuVue({
             el: "#app",
             data: () => {
-                return { msg: 1 }
+                return { msg: 1,a:3}
             }
         })
         // console.log(vm)
